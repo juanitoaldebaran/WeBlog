@@ -3,7 +3,9 @@ package com.aldebaran.WeBlog.controller;
 import com.aldebaran.WeBlog.dto.request.LoginRequest;
 import com.aldebaran.WeBlog.dto.request.RegisterRequest;
 import com.aldebaran.WeBlog.dto.response.LoginResponse;
+import com.aldebaran.WeBlog.exception.EmailHasBeenUsedException;
 import com.aldebaran.WeBlog.model.User;
+import com.aldebaran.WeBlog.repository.UserRepository;
 import com.aldebaran.WeBlog.service.AuthService;
 import com.aldebaran.WeBlog.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AuthController(AuthService authService, JwtService jwtService) {
+    public AuthController(AuthService authService, JwtService jwtService, UserRepository userRepository) {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
-        User newUser = authService.registerUser(registerRequest);
+        try {
+            User newUser = authService.registerUser(registerRequest);
 
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        } catch (EmailHasBeenUsedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping("/login")
