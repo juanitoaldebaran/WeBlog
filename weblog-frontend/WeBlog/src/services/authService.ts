@@ -1,7 +1,7 @@
 import type { LoginRequest, LoginResponse, RegisterRequest, User } from "../types/auth";
 import api from "../config/api";
 
-export async function login(credentials: LoginRequest): Promise<LoginResponse> {
+async function login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
         const response = await api.post('/auth/login', credentials);
 
@@ -12,7 +12,7 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
     }
 }
 
-export async function register(credentials: RegisterRequest): Promise<User> {
+async function register(credentials: RegisterRequest): Promise<User> {
     try {
         const response = await api.post('/auth/signup', credentials);
 
@@ -23,18 +23,26 @@ export async function register(credentials: RegisterRequest): Promise<User> {
     }
 } 
 
-export function logout() {
+function logout() {
     localStorage.removeItem("jwtToken");
     localStorage.removeItem("user");
     window.location.href = '/auth/login';
 }
 
-export function getJwtToken(): string | null {
+function getJwtToken(): string | null {
     return localStorage.getItem("jwtToken");
 }
 
-export function isAuthenticated(): boolean {
+function isAuthenticated(): boolean {
     const jwtToken = getJwtToken();
 
     return jwtToken != null;
+}
+
+export default {
+    login,
+    register,
+    logout,
+    getJwtToken,
+    isAuthenticated
 }
