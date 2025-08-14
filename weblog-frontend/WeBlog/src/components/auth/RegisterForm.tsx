@@ -58,7 +58,7 @@ const RegisterForm: React.FC = () => {
 
     
     return (
-        <div className="max-w-md border border-gray-200 rounded-lg shadow-lg bg-white p-12 sm:px-6 lg:px-8 w-full space-y-6">
+        <div className="max-w-md bg-white p-12 sm:px-6 lg:px-8 w-full space-y-6">
             <div className="text-center">
                 <h1 className="text-3xl font-light">Sign Up</h1>
             </div>

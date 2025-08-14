@@ -1,18 +1,32 @@
 import './App.css'
-import { BrowserRouter as Router, Routes, Route } from 'react-router'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
+import HomePage from './pages/HomePage'
+import Navbar from './components/common/Navbar'
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const hideNavbarOn = ["/auth/signup", "/auth/login"];
+  const shouldHideNavbar = hideNavbarOn.includes(location.pathname);
 
   return (
-    <Router>
+    <>
+     {!shouldHideNavbar && <Navbar />}
        <Routes>
         <Route path='/auth/signup' element={<RegisterPage />}></Route>
         <Route path='/auth/login' element={<LoginPage />}></Route>
+        <Route path='/' element={<HomePage />}></Route>
       </Routes>
-    </Router>
+    </>
   )
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  )
+}
+export default App;
