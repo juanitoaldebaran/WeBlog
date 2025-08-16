@@ -8,6 +8,12 @@ export interface User {
     updatedAt: number;
 }
 
+export interface Subscription {
+    id: number;
+    subscriptionEmail: string;
+    createdAt: number;
+}
+
 export interface LoginRequest {
     email: string;
     password: string;
@@ -27,6 +33,7 @@ export interface LoginResponse {
 
 export interface AuthContextType {
     user: User | null;
+    subcription: Subscription | null;
     login: (credentials: LoginRequest) => Promise<LoginResponse>;
     register: (credentials: RegisterRequest) => Promise<User>;
     logout: () => void;
