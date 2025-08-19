@@ -6,9 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table (name = "user_table")
@@ -37,10 +35,17 @@ public class User implements UserDetails {
     @Column (name = "updated_at")
     private Date updatedAt;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Blog> blogs = new ArrayList<>();
+
+
     public User() {
     }
 
-    public User(Long id, String firstName, String lastName, String email, String password, Date issuedAt, Date updatedAt) {
+    public User(Long id, String firstName, String lastName, String email, String password, Date issuedAt, Date updatedAt, List<Blog> blogs) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -48,6 +53,7 @@ public class User implements UserDetails {
         this.password = password;
         this.issuedAt = issuedAt;
         this.updatedAt = updatedAt;
+        this.blogs = blogs;
     }
 
 
@@ -107,6 +113,22 @@ public class User implements UserDetails {
     public User setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
         return this;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Blog> getBlogs() {
+        return blogs;
+    }
+
+    public void setBlogs(List<Blog> blogs) {
+        this.blogs = blogs;
     }
 
     @Override
