@@ -5,7 +5,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ word, subject }) => {
     return (
-        <div className="bg-blue-500 text-white rounded-xl shadow-lg p-6 flex flex-col hover:scale-[1.02] transition-transform duration-300 w-72 min-h-[220px]">
+        <div className="bg-blue-500 text-white rounded-xl shadow-lg p-6 flex flex-col hover:scale-[1.02] transition-transform duration-300 w-72 min-h-[220px] cursor-pointer">
             <h3 className="text-xl font-bold mb-3">
                 {word}
             </h3>

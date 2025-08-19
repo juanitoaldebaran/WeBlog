@@ -18,7 +18,7 @@ const AboutPage: React.FC = () => {
                             Our mission is to give everyone a voice to share their journey, ideas, and culture with the world.  
                             <br /><br />
                             We provide a platform for users to share their interests across various fields such as  
-                            <span className="font-semibold text-blue-600"> Technology, Health, Sports, Finance, Travel, and Lifestyle</span>.  
+                            <span className="font-semibold text-blue-600"> Technology, Health, Sports, Finance, Travel</span>.  
                             Whether you are an aspiring writer or a passionate reader, WeBlog is your gateway to a global community of storytellers.
                         </p>
                     </div>

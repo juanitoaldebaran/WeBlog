@@ -33,11 +33,31 @@ export interface LoginResponse {
 
 export interface AuthContextType {
     user: User | null;
-    subcription: Subscription | null;
     login: (credentials: LoginRequest) => Promise<LoginResponse>;
     register: (credentials: RegisterRequest) => Promise<User>;
     logout: () => void;
     getJwtToken: () => string | null;
     isLoading: boolean;
     isAuthenticated: boolean;
+}
+
+export interface Comment {
+  id: number;
+  blogId: number;
+  authorId: number;
+  authorName: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface Blog {
+    id: number;
+    title: string;
+    content: string;
+    category: 'TECHNOLOGY' | 'HEALTH' | 'FINANCE' | 'TRAVEL' | 'SPORT';
+    imageUrl: string;
+    description: string;
+    commentCount: number;
+    createdAt: number;
+    views: number;
 }
