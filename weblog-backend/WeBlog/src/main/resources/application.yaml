@@ -9,7 +9,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   expiration: 86400000
+
+imagekit:
+  private-key: ${IMAGEKIT_PRIVATE_KEY}
+  public-key: ${IMAGEKIT_PUBLIC_KEY}
+  url-endpoint: ${IMAGEKIT_URL_ENDPOINT}

@@ -2,6 +2,7 @@ package com.aldebaran.WeBlog.service;
 
 import com.aldebaran.WeBlog.dto.request.LoginRequest;
 import com.aldebaran.WeBlog.dto.request.RegisterRequest;
+import com.aldebaran.WeBlog.exception.EmailHasBeenUsedException;
 import com.aldebaran.WeBlog.model.User;
 import com.aldebaran.WeBlog.repository.UserRepository;
 import org.slf4j.Logger;
@@ -30,6 +31,10 @@ public class AuthService {
     }
 
     public User registerUser(RegisterRequest registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new EmailHasBeenUsedException("Email is already in use");
+        }
+
         User newUser = new User()
                 .setFirstName(registerRequest.getFirstName())
                 .setLastName(registerRequest.getLastName())
