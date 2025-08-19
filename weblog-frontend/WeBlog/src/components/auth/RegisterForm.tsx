@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { Eye, EyeOff } from "lucide-react";
 import Alert from "../common/Alert";
+import PasswordMatch from "./PasswordMatch";
 
 
 const RegisterForm: React.FC = () => {
@@ -19,6 +20,7 @@ const RegisterForm: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const isFormValid = registerData.firstName && registerData.lastName && registerData.email && registerData.password && confirmPassword;
+    const passwordValid = registerData.password && confirmPassword && registerData.password === confirmPassword;
 
     const handleChange =  (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value} = e.target;
@@ -46,6 +48,12 @@ const RegisterForm: React.FC = () => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!regex.test(registerData.email)) {
             setError("Please input a valid email address");
+        }
+
+        if (!passwordValid) {
+            console.error("Password and confirm password error");
+            setError("");
+            return;
         }
 
         try {
@@ -140,6 +148,13 @@ const RegisterForm: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full p-2 bg-white border-b focus:border-b-blue-400 focus:outline-none transition-all" 
                     />
+
+                    {confirmPassword && 
+                       <PasswordMatch 
+                        message={passwordValid ? "Password matches confirm password" : "Password must be match with confirm password"}
+                        status={passwordValid ? "success" : "error"}
+                       />
+                    }
                 </div>
 
                 <button disabled={!isFormValid} type="submit" className="w-full bg-blue-500 p-2 rounded-lg text-white cursor-pointer hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">

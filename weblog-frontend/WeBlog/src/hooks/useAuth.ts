@@ -1,73 +1,72 @@
 import authService from "../services/authService";
-import type { LoginRequest, RegisterRequest, User } from "../types/auth";
+import type { AuthContextType, LoginRequest, RegisterRequest, User, LoginResponse } from "../types/auth";
 import { useEffect, useState } from "react";
 
-export const useAuth = () => {
-   const [user, setUser] = useState<User | null>(null);
-   const [isLoading, setIsLoading] = useState(false);
-   const [isAuthenticated, setIsAuthenticated] = useState(false);
+export const useAuth = (): AuthContextType => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-   useEffect(() => {
-      const jwtToken = authService.getJwtToken();
+  useEffect(() => {
+    const jwtToken = authService.getJwtToken();
+    const storedUser = localStorage.getItem("user");
+    if (jwtToken && storedUser) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
-      if (jwtToken) {
-         setIsAuthenticated(true);
-      }
-   
-   }, [])
+  const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
+    setIsLoading(true);
+    try {
+      const response: LoginResponse = await authService.login(credentials);
 
-   const login = async (credentials: LoginRequest) => {
-      setIsLoading(true);
-      try {
-         const response = await authService.login(credentials);
-         setIsAuthenticated(true);
-         setUser({
-            email: credentials.email,
-            password: credentials.password
-         } as User);
+      setIsAuthenticated(true);
+      setUser({
+        email: credentials.email,
+      } as User);
 
-         return response;
-      } catch (error: any) {
-         setIsAuthenticated(false);
-      } finally {
-         setIsLoading(false);
-      }
-   }
-
-   const register = async (credentials: RegisterRequest) => {
-      setIsLoading(true);
-      try {
-         const response = await authService.register(credentials);
-
-         setIsAuthenticated(true);
-         setUser(user);
-
-         return response;
-      } catch (error: any) {
-         setIsAuthenticated(false);
-      } finally {
-         setIsLoading(false);
-      }
-   } 
-
-   const logout = () => {
-      authService.logout();
+      return response;
+    } catch (error: any) {
       setIsAuthenticated(false);
-      setUser(null);
-   } 
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-   const getJwtToken = (): string | null => {
-      return authService.getJwtToken();
-   }
+  const register = async (credentials: RegisterRequest): Promise<User> => {
+    setIsLoading(true);
+    try {
+      const response: User = await authService.register(credentials);
 
-   return {
-      login,
-      register,
-      logout,
-      getJwtToken,
-      user,
-      isLoading,
-      isAuthenticated
-   }
+      setIsAuthenticated(true);
+      setUser(response);
 
-}
+      return response;
+    } catch (error: any) {
+      setIsAuthenticated(false);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = () => {
+    authService.logout();
+    setIsAuthenticated(false);
+    setUser(null);
+  };
+
+  const getJwtToken = (): string | null => authService.getJwtToken();
+
+  return {
+    user,
+    isLoading,
+    isAuthenticated,
+    login,
+    register,
+    logout,
+    getJwtToken
+  };
+};

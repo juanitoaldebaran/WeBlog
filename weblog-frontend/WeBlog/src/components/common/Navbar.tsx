@@ -42,9 +42,6 @@ const Navbar: React.FC = () => {
                         ))}
                     </ul>
                     <div className="flex items-center gap-4">
-                        <Link to='/auth/login' className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium">
-                            Login
-                        </Link>
                         <Link to='/auth/signup' className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
                             Get Started
                         </Link>

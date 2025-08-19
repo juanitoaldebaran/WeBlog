@@ -1,12 +1,20 @@
 import { Link } from "react-router";
 import SubscriptionEmail from "../components/subscription/SubscriptionEmail";
 import Footer from "../components/common/Footer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRobot } from "@fortawesome/free-solid-svg-icons";
 
 const HomePage: React.FC = () => {
     return (
         <div className="min-h-screen bg-white">
             <section className="pt-50 pb-14 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-10">
+                        <span className="rounded-lg p-4 flex items-center justify-center gap-2 text-black underline">
+                            <FontAwesomeIcon icon={faRobot}/>
+                            New Feature with AI
+                        </span>
+                    </div>
                     <div className="text-center max-4-xl mx-auto">
                         <h1 className="text-5xl font-bold sm:text-6xl lg:text-7xl leading-tight mb-6">Blog Online Platform</h1>
                         <span className="text-4xl sm:text-5xl lg:text-6xl text-blue-500">Share Your Stories Here</span>
