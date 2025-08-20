@@ -1,17 +1,13 @@
 import type React from "react";
 import authService from "../../services/authService";
-import { useState } from "react";
-import Alert from "./Alert";
 import { Link } from "react-router";
 
 const NavbarUser: React.FC = () => {
-    const [error, setError] = useState<string>("");
-
     const handleLogOut = () => {
         try {
             authService.logout();
         } catch (error: any) {
-            setError("");
+            console.error(error?.response?.status?.message || "Error logging out");
         }
     }
 
@@ -23,14 +19,6 @@ const NavbarUser: React.FC = () => {
                         <Link to='/' className="font-bold text-blue-600 text-2xl">WeBlog</Link>
                     </div>
                     <div>
-                        {error && 
-                        <Alert
-                        message={error}
-                        status="error"
-                        onClose={() => setError("")}
-                        >
-                        </Alert>
-                        }
                         <button onClick={handleLogOut} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 cursor-pointer">
                             Logout
                         </button>

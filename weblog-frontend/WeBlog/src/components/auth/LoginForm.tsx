@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { LoginRequest } from "../../types/auth";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { Eye, EyeOff } from "lucide-react";
-import Alert from "../common/Alert";
+import Notification from "../common/Notification";
+import useNotification from "../../hooks/useNotification";
 
 
 const LoginForm: React.FC = () => {
@@ -12,10 +13,13 @@ const LoginForm: React.FC = () => {
         email: "",
         password: "",
     });
-    const [error, setError] = useState<string>("");
     const {login, isLoading} = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const isFormValid = loginData.email && loginData.password;
+    const navigate = useNavigate();
+    const location = useLocation();
+    const fromPath = location.state?.fromPath?.pathname || "/";
+    const {notification, showNotification, hideNotification} = useNotification();
 
     const handleChange =  (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value} = e.target;
@@ -24,33 +28,33 @@ const LoginForm: React.FC = () => {
             [name]: value,
         }));
 
-        if (error) {
-            setError("");
-        }
     }
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError("");
         
         if (!isFormValid) {
-            console.error("Invalid login input");
-            setError("");
+            showNotification("Please fill all fields", "warning");
             return;
         }
 
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!regex.test(loginData.email)) {
-            setError("Please input a valid email address");
+            showNotification("Please input a valid email address", "error");
+            return;
         }
 
         try {
             await login(loginData);
-
+            showNotification("Login succesful!, Welcome back", "success");
+            console.log("Login successfully");
+            setTimeout(() => {
+                navigate(fromPath, { replace: true })
+            }, 1500);
         } catch (error: any) {
-            setError(error.message || "Login Failed");
-        }
+            showNotification("Login Failed. Please check your credentials", "error")
+        } 
     }
 
     
@@ -66,14 +70,6 @@ const LoginForm: React.FC = () => {
                 <Link to={'/auth/signup'} className="text-blue-500 underline">Sign Up</Link>
             </div>
             <form className="mt-8 space-y-8" onSubmit={handleSubmit}>
-                {error && (
-                    <Alert
-                    message={error}
-                    status="error"
-                    onClose={() => setError("")}
-                    >
-                    </Alert>
-                )}
 
                 <div>
                     <input
@@ -108,6 +104,15 @@ const LoginForm: React.FC = () => {
                 </button>
                 
             </form>
+
+            <Notification 
+                message={notification.message}
+                type={notification.type}
+                isVisible={notification.isVisible}
+                onClose={hideNotification}
+                position="top-center"
+                duration={4000}
+            />
         </div>
     )
 }

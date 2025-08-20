@@ -1,4 +1,4 @@
-import React from 'react';
+import { useAuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
@@ -15,6 +15,8 @@ const navLinks: NavLinkType[] = [
 ]
 
 const Navbar: React.FC = () => {
+    const {isAuthenticated} = useAuthContext();
+
     return (
         <header className="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,14 +44,29 @@ const Navbar: React.FC = () => {
                         ))}
                     </ul>
                     <div className="flex items-center gap-4">
-                        <Link to='/auth/signup' className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
-                            Get Started
-                        </Link>
-                        <div>
+                        {!isAuthenticated ? (
+                        <>
+                            <Link 
+                                to='/auth/signup' 
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
+                                >
+                                    Get Started
+                            </Link>
+                            <Link to='/auth/login'>
+                                <FontAwesomeIcon 
+                                    icon={faUser} 
+                                    className="cursor-pointer hover:text-blue-600"
+                                    title="Login"
+                                 />
+                            </Link>
+                        </>
+                        ) : (
+                        <>
                             <Link to={'/user'}>
                                  <FontAwesomeIcon icon={faUser} className="cursor-pointer hover:text-blue-600"/>
                             </Link>
-                        </div>
+                        </>
+                        )}
                     </div>
                 </nav>
             </div>

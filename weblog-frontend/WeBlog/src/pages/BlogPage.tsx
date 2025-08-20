@@ -1,90 +1,87 @@
 import { useEffect, useState } from "react";
-import authService from "../services/authService";
-import type { Blog, Comment } from "../types/auth";
-import { useAuthContext } from "../context/AuthContext";
+import type { Blog } from "../types/blog";
+import { useAuth } from "../hooks/useAuth";
+import blogService from "../services/blogService";
+import NavbarBlog from "../components/common/NavbarBlog";
+import { Link } from "react-router";
+import BlogCard from "../components/common/BlogCard";
+import useNotification from "../hooks/useNotification";
+import Notification from "../components/common/Notification";
 
 const BlogPage: React.FC = () => {
-  const {user} = useAuthContext();
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {notification, showNotification, hideNotification} = useNotification();
+  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+
+  const {user} = useAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchBlogs = async () => {
       try {
-        const blogData = await authService.getAllBlogs();
-        setBlogs(blogData);
-
-        const commentData = await authService.getComments();
-        setComments(commentData);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+        const allBlogs = await blogService.getAllBlogs();
+        setBlogs(allBlogs);
+      } catch (error: any) {
+        showNotification("Error fetch blogs", "error");
       }
-    };
-    fetchData();
-  }, []);
+    }
 
-  if (loading) return <p>Loading...</p>;
+    fetchBlogs();
+  }, [])
 
-  if (!user) {
-    return (
-      <div className="p-6">
-        <h2 className="text-xl font-bold">Please log in to view blogs and comments</h2>
-      </div>
-    );
-  }
-
-  const myBlogs = blogs.filter(blog => blog.id === user.id);
-  const myComments = comments.filter(comment => comment.authorId === user.id);
+  const filteredBlogs = selectedCategory === "ALL" ? blogs : blogs.filter((filterBlogs) => filterBlogs.category === selectedCategory);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Blog Page</h1>
+    <div className="min-h-screen bg-white">
+       <section className="pt-40 pb-14 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center max-w-4xl mx-auto">
+                        <h1 className="text-5xl font-bold sm:text-xl lg:text-6xl leading-tight mb-6">
+                            Create your blog
+                        </h1>
+                        <p className="text-blue-600 text-2xl">Share your ideas with user arround the world</p>
+                    </div>
+                </div>
+        </section>
 
-      <section>
-        <h2 className="text-xl font-semibold">My Blogs</h2>
-        {myBlogs.length === 0 ? (
-          <p>No blogs yet</p>
-        ) : (
-          myBlogs.map(blog => (
-            <div key={blog.id} className="border p-4 rounded-md">
-              <h3 className="text-lg font-bold">{blog.title}</h3>
-              <p className="text-sm text-gray-600">{blog.category}</p>
-              <p>{blog.content}</p>
-            </div>
-          ))
-        )}
-      </section>
+      {!user && (
+        <div className="max-w-2xl mx-auto mb-12 bg-blue-50 p-6 rounded-2xl text-center">
+          <h2 className="text-lg font-semibold text-yellow-800">
+            🔒 You must sign in to create a blog
+          </h2>
+          <p className="text-sm text-gray-600 mt-2">
+            Please <Link to={"/auth/login"} className="text-blue-600 hover:underline"> Login </Link>
+            or Create an account <Link to={"/auth/signup"} className="text-blue-600 hover:underline">Sign Up </Link>
+          </p>
+        </div>
+      )}
 
-      <section>
-        <h2 className="text-xl font-semibold">My Comments</h2>
-        {myComments.length === 0 ? (
-          <p>No comments yet</p>
-        ) : (
-          myComments.map(comment => (
-            <div key={comment.id} className="border p-3 rounded-md">
-              <p className="text-sm text-gray-600">On Blog #{comment.blogId}</p>
-              <p>{comment.content}</p>
-              <p className="text-xs text-gray-500">
-                {new Date(comment.createdAt).toLocaleString()}
-              </p>
-            </div>
-          ))
-        )}
-      </section>
+      <div className="max-w-2xl mx-auto mb-12">
+        <NavbarBlog selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}/>
+      </div>
+      
 
-      <section>
-        <h2 className="text-xl font-semibold">All Blogs</h2>
-        {blogs.map(blog => (
-          <div key={blog.id} className="border p-4 rounded-md">
-            <h3 className="text-lg font-bold">{blog.title}</h3>
-            <p className="text-sm text-gray-600">{blog.category}</p>
-            <p>{blog.content}</p>
-          </div>
-        ))}
-      </section>
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredBlogs.length > 0 ?
+          filteredBlogs.map((allBlogs) => 
+            <Link to={`/blog/${allBlogs.id}`}>
+              <BlogCard blog={allBlogs}/>
+            </Link>
+        )
+        :
+          <p className="text-center col-span-3 text-gray-600">
+            No Blogs available yet.
+          </p>
+        }
+      </div>
+
+      <Notification 
+                message={notification.message}
+                type={notification.type}
+                isVisible={notification.isVisible}
+                onClose={hideNotification}
+                position="top-center"
+                duration={4000}
+            />
     </div>
   );
 }

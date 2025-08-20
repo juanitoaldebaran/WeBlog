@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse, RegisterRequest, User, Blog, Comment } from "../types/auth";
+import type { LoginRequest, LoginResponse, RegisterRequest, User } from "../types/auth";
 import api from "../config/api";
 
 async function login(credentials: LoginRequest): Promise<LoginResponse> {
@@ -39,55 +39,10 @@ function isAuthenticated(): boolean {
     return jwtToken != null;
 }
 
-async function getAllBlogs(): Promise<Blog[]> {
-    try {
-        const response = await api.get("/blog");
-        
-        return response.data.map((blog: Blog) => ({
-        ...blog,
-        createdAt: new Date(blog.createdAt).toISOString()
-        }));
-    } catch (error: any) {
-        console.error("getBlog error:", error);
-        throw new Error(error.response?.data?.message || "Failed to load blog endpoints");
-    }
-}
-
-async function getComments(blogId?: number): Promise<Comment[]> {
-    try {
-        const response = await api.get("/comment", { params: { blogId }});
-        return response.data as Comment []; 
-    } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to load comments");
-    }
-}
-
-async function createComments(commentData: {blogId: number; content: string}): Promise<Comment> {
-    try {
-        const response = await api.post("/comment", commentData);
-        return response.data as Comment;
-    } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to create comment");
-    }
-}
-
-async function createBlog(blog: Blog): Promise<Blog> {
-    try {
-        const response = await api.post("/blog", blog);
-        return response.data as Blog;
-    } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to create blog");
-    }
-}
-
 export default {
     login,
     register,
     logout,
     getJwtToken,
     isAuthenticated,
-    getAllBlogs,
-    getComments,
-    createComments,
-    createBlog
 }
