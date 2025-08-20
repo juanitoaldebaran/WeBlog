@@ -3,11 +3,14 @@ import SubscriptionEmail from "../components/subscription/SubscriptionEmail";
 import Footer from "../components/common/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRobot } from "@fortawesome/free-solid-svg-icons";
+import TypingWord from "../components/common/TypingWord";
+import Notification from "../components/common/Notification";
 
 const HomePage: React.FC = () => {
     return (
         <div className="min-h-screen bg-white">
             <section className="pt-50 pb-14 px-4 sm:px-6 lg:px-8">
+                <Notification content={"Test"} />
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-10">
                         <span className="rounded-lg p-4 flex items-center justify-center gap-2 text-black underline">
@@ -20,10 +23,8 @@ const HomePage: React.FC = () => {
                         <span className="text-4xl sm:text-5xl lg:text-6xl text-blue-500">Share Your Stories Here</span>
                     </div>
                 </div>
-                <div className="text-center mt-12 space-y-2">
-                    <p className="text-[14px] italic leading-relaxed">
-                            We encourage people to share their stories around the world.
-                    </p>
+                <div className="text-center mt-16 space-y-2">
+                    <TypingWord word="Subscribe to get an updated notifications from us!"/>
                 </div>
                 <div className="mt-16">
                     <SubscriptionEmail />

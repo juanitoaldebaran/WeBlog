@@ -11,9 +11,18 @@ export const useAuth = (): AuthContextType => {
     const jwtToken = authService.getJwtToken();
     const storedUser = localStorage.getItem("user");
     if (jwtToken && storedUser) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(storedUser));
-    }
+      try {
+        setIsAuthenticated(true);
+        setUser(JSON.parse(storedUser));
+        } catch (error: any) {
+          console.error("Error parsing stored user", error);
+          localStorage.removeItem("user");
+          localStorage.removeItem("jwtToken");
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+     }
+     
   }, []);
 
   const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
@@ -21,17 +30,17 @@ export const useAuth = (): AuthContextType => {
     try {
       const response: LoginResponse = await authService.login(credentials);
 
-      setIsAuthenticated(true);
-      setUser({
-        email: credentials.email,
-      } as User);
+      if (response.user) {
+        localStorage.setItem("jwtToken", response.jwtToken);
+      }
 
-      return response;
+      if (response.user) {
+        setIsAuthenticated(true);
+        setUser(response.user);
+        localStorage.setItem("user", JSON.stringify(response.user));
+      }
     } catch (error: any) {
-      setIsAuthenticated(false);
-      throw error;
-    } finally {
-      setIsLoading(false);
+
     }
   };
 
