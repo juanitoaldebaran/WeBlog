@@ -3,6 +3,7 @@ package com.aldebaran.WeBlog.dto.response;
 public class LoginResponse {
     private String jwtToken;
     private long expiresIn;
+    private UserResponse user;
 
     public String getJwtToken() {
         return jwtToken;
@@ -28,5 +29,14 @@ public class LoginResponse {
     public LoginResponse setExpiresIn(long expiresIn) {
         this.expiresIn = expiresIn;
         return this;
+    }
+
+    public UserResponse getUser() {
+        return user;
+    }
+
+    public LoginResponse setUser(UserResponse user) {
+        this.user = user;
+        return  this;
     }
 }

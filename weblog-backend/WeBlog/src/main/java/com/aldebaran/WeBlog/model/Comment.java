@@ -1,5 +1,6 @@
 package com.aldebaran.WeBlog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.cglib.core.Local;
 
@@ -21,6 +22,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id", nullable = false)
+    @JsonIgnore
     private Blog blog;
 
     @ManyToOne(fetch = FetchType.LAZY)
