@@ -3,6 +3,7 @@ package com.aldebaran.WeBlog.controller;
 import com.aldebaran.WeBlog.dto.request.LoginRequest;
 import com.aldebaran.WeBlog.dto.request.RegisterRequest;
 import com.aldebaran.WeBlog.dto.response.LoginResponse;
+import com.aldebaran.WeBlog.dto.response.UserResponse;
 import com.aldebaran.WeBlog.exception.EmailHasBeenUsedException;
 import com.aldebaran.WeBlog.model.User;
 import com.aldebaran.WeBlog.repository.UserRepository;
@@ -47,7 +48,12 @@ public class AuthController {
 
         String jwtTokenResponse = jwtService.generateToken(loginUser);
 
-        LoginResponse loginResponse = new LoginResponse().setJwtToken(jwtTokenResponse).setExpiresIn(jwtService.getExpiresIn());
+        UserResponse userResponse = new UserResponse(loginUser);
+
+        LoginResponse loginResponse = new LoginResponse()
+                .setJwtToken(jwtTokenResponse)
+                .setExpiresIn(jwtService.getExpiresIn())
+                .setUser(userResponse);
 
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
