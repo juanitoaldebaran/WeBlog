@@ -4,13 +4,11 @@ import Footer from "../components/common/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRobot } from "@fortawesome/free-solid-svg-icons";
 import TypingWord from "../components/common/TypingWord";
-import Notification from "../components/common/Notification";
 
 const HomePage: React.FC = () => {
     return (
         <div className="min-h-screen bg-white">
             <section className="pt-50 pb-14 px-4 sm:px-6 lg:px-8">
-                <Notification content={"Test"} />
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-10">
                         <span className="rounded-lg p-4 flex items-center justify-center gap-2 text-black underline">
@@ -30,11 +28,8 @@ const HomePage: React.FC = () => {
                     <SubscriptionEmail />
                 </div>
                 <div className="flex items-center justify-center mb-16 mt-20 space-x-5">
-                    <Link to='/blog' className="rounded bg-blue-600 text-white p-4 hover:bg-blue-800">
-                        Join Our Community
-                    </Link>
-                    <Link to='/blog' className="rounded bg-blue-600 text-white p-4 hover:bg-blue-800">
-                        Explore Stories
+                    <Link to='/blog' className="text-gray-700 underline p-4 hover:text-blue-800">
+                         Explore Stories
                     </Link>
                 </div>
             </section>

@@ -2,7 +2,7 @@ import authService from "../services/authService";
 import type { AuthContextType, LoginRequest, RegisterRequest, User, LoginResponse } from "../types/auth";
 import { useEffect, useState } from "react";
 
-export const useAuth = (): AuthContextType => {
+const useAuth = (): AuthContextType => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,8 +39,14 @@ export const useAuth = (): AuthContextType => {
         setUser(response.user);
         localStorage.setItem("user", JSON.stringify(response.user));
       }
-    } catch (error: any) {
 
+      return response;
+    } catch (error: any) {
+      setIsAuthenticated(false);
+      setUser(null);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,13 +54,10 @@ export const useAuth = (): AuthContextType => {
     setIsLoading(true);
     try {
       const response: User = await authService.register(credentials);
-
-      setIsAuthenticated(true);
-      setUser(response);
-
       return response;
     } catch (error: any) {
       setIsAuthenticated(false);
+      setUser(null);
       throw error;
     } finally {
       setIsLoading(false);
@@ -79,3 +82,5 @@ export const useAuth = (): AuthContextType => {
     getJwtToken
   };
 };
+
+export default useAuth;
