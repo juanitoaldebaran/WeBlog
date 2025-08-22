@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { RegisterRequest } from "../../types/auth";
-import { useAuth } from "../../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { Eye, EyeOff } from "lucide-react";
 import PasswordMatch from "./PasswordMatch";
@@ -61,7 +61,7 @@ const RegisterForm: React.FC = () => {
             console.log("Register Successfully and Navigate to ", fromPath);
             setTimeout(() => {
                 navigate(fromPath, { replace: true });
-            }, 4000) 
+            }, 1500); 
         } catch (error: any) {
             showNotification("Failed to create an account", "error");
         } 

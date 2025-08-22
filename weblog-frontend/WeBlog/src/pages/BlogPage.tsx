@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import type { Blog } from "../types/blog";
-import { useAuth } from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
 import blogService from "../services/blogService";
 import NavbarBlog from "../components/common/NavbarBlog";
 import { Link } from "react-router";
 import BlogCard from "../components/common/BlogCard";
 import useNotification from "../hooks/useNotification";
 import Notification from "../components/common/Notification";
+import Footer from "../components/common/Footer";
 
 const BlogPage: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -74,6 +75,10 @@ const BlogPage: React.FC = () => {
         }
       </div>
 
+      <div className="mt-150">
+        <Footer />
+      </div>
+
       <Notification 
                 message={notification.message}
                 type={notification.type}
@@ -81,7 +86,7 @@ const BlogPage: React.FC = () => {
                 onClose={hideNotification}
                 position="top-center"
                 duration={4000}
-            />
+      />
     </div>
   );
 }

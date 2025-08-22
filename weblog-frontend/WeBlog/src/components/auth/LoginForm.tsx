@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { LoginRequest } from "../../types/auth";
-import { useAuth } from "../../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { Eye, EyeOff } from "lucide-react";
 import Notification from "../common/Notification";

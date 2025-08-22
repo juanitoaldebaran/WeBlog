@@ -10,7 +10,7 @@ export interface Blog {
     views: number;
 }
 
-export interface CreateBlogDTO {
+export interface CreateBlogRequest {
     title: string;
     content: string;
     category: 'TECHNOLOGY' | 'HEALTH' | 'FINANCE' | 'TRAVEL' | 'SPORT';
