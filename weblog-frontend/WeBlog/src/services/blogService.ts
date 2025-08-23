@@ -4,7 +4,7 @@ import api from "../config/api";
 async function getAllBlogs(): Promise<Blog[]> {
     try {
         const response = await api.get("/blog");
-        console.log("Request sent to get all blogs");
+        console.log("Request sent to get all blogs", response.data);
         return response.data as Blog[];
     } catch (error: any) {
         throw new Error(error?.response?.data?.message || "Failed to get all blogs");

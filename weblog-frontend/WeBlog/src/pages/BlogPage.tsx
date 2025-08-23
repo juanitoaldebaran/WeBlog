@@ -16,7 +16,6 @@ const BlogPage: React.FC = () => {
 
   const {user} = useAuth();
 
-  useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const allBlogs = await blogService.getAllBlogs();
@@ -26,8 +25,21 @@ const BlogPage: React.FC = () => {
       }
     }
 
-    fetchBlogs();
-  }, [])
+    useEffect(() => {
+      fetchBlogs();
+    }, []);
+
+    useEffect(() => {
+      const handleFocus = () => {
+        console.log("DEBUG: Window focused, refreshing blogs");
+        fetchBlogs();
+      }
+      window.addEventListener("focus", handleFocus);
+
+      return () => {
+        window.removeEventListener("focus", handleFocus);
+      }
+    }, []);
 
   const filteredBlogs = selectedCategory === "ALL" ? blogs : blogs.filter((filterBlogs) => filterBlogs.category === selectedCategory);
 
@@ -64,7 +76,7 @@ const BlogPage: React.FC = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBlogs.length > 0 ?
           filteredBlogs.map((allBlogs) => 
-            <Link to={`/blog/${allBlogs.id}`}>
+            <Link key={allBlogs.id} to={`/blog/${allBlogs.id}`}>
               <BlogCard blog={allBlogs}/>
             </Link>
         )

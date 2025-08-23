@@ -8,17 +8,23 @@ import UserSidebar from "../components/dashboard/UserSidebar";
 
 const UserPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>("dashboard");
+    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+    const handleRefreshData = () => {
+        setRefreshTrigger((prev) => (prev + 1));
+        console.log("DEBUG: Triggering data refresh");
+    }
 
     const renderContent = () => {
         switch (activeTab) {
             case "dashboard":
-                return <DashboardContent />;
+                return <DashboardContent refreshTrigger={refreshTrigger} />;
             case "add-blog":
-                return <AddBlog />;
+                return <AddBlog onBlogCreated={handleRefreshData}/>;
             case "my-blog":
-                return <BlogList />;
+                return <BlogList refreshTrigger={refreshTrigger}/>;
             case "my-comments":
-                return <CommentList />;
+                return <CommentList refreshTrigger={refreshTrigger}/>;
             default:
                 return <DashboardContent />;
         }
