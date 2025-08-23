@@ -1,4 +1,8 @@
-const CommentList: React.FC = () => {
+interface CommentListProps {
+    refreshTrigger: number;
+}
+
+const CommentList: React.FC<CommentListProps> = ({refreshTrigger}) => {
     return (
         <div>
 
