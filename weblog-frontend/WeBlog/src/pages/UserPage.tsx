@@ -35,7 +35,7 @@ const UserPage: React.FC = () => {
             <NavbarUser />
             <div className="flex flex-1">
                 <UserSidebar onChangeTab={setActiveTab} activeTab={activeTab}/>
-                <main className="flex-1 p-6 ml-64 bg-blue-50 overflow-auto">
+                <main className="flex-1 p-6 ml-64  overflow-auto">
                     {renderContent()}
                 </main>
             </div>

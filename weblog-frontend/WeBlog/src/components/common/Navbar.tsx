@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
                             </Link>
                         </div>
                     ) : (
-                            <Link to={'/user'} className="flex items-center justify-center gap-2 rounded bg-gray-50 p-2 shadow cursor-pointer hover:bg-gray-100">
+                            <Link to={'/user'} className="flex items-center justify-between gap-4 rounded bg-gray-50 py-2 px-8 shadow cursor-pointer hover:bg-gray-100">
                                 <FontAwesomeIcon icon={faUser}/>
                                 <p >{user?.firstName}</p>
                             </Link>
