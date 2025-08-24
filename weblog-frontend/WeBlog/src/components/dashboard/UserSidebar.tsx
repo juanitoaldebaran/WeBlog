@@ -1,3 +1,5 @@
+import { faAdd, faCheck, faComment, faHome } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
 interface UserSidebarProps {
@@ -7,10 +9,10 @@ interface UserSidebarProps {
 
 const UserSidebar: React.FC<UserSidebarProps> = ({onChangeTab, activeTab}) => {
     const userTabType = [
-        {id: "dashboard", label: "Dashboard"},
-        {id: "add-blog", label: "Add blog"},
-        {id: "my-blog", label: "My blog"},
-        {id: "my-comments", label: "My comment"},
+        {id: "dashboard", label: "Dashboard", font: <FontAwesomeIcon icon={faHome}/>},
+        {id: "add-blog", label: "Add blog", font: <FontAwesomeIcon icon={faAdd}/>},
+        {id: "my-blog", label: "My blog", font: <FontAwesomeIcon icon={faCheck} />},
+        {id: "my-comments", label: "My comment", font: <FontAwesomeIcon icon={faComment}/>},
     ]
 
     return (
@@ -26,6 +28,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({onChangeTab, activeTab}) => {
                         ${activeTab === menu.id ? `bg-blue-600 font-semibold text-white` : `hover:bg-gray-100`}
                         `}
                 >
+                    {menu.font}
                     {menu.label}
                 </button>
             </li>

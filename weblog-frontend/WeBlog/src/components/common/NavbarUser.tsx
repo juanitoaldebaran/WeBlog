@@ -1,6 +1,8 @@
 import type React from "react";
 import authService from "../../services/authService";
 import { Link } from "react-router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 const NavbarUser: React.FC = () => {
     const handleLogOut = () => {
@@ -18,10 +20,11 @@ const NavbarUser: React.FC = () => {
                     <div>
                         <Link to='/' className="font-bold text-blue-600 text-2xl">WeBlog</Link>
                     </div>
-                    <div>
-                        <button onClick={handleLogOut} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 cursor-pointer">
+                    <div className="flex items-center justify-center bg-blue-500 text-white p-2 rounded hover:bg-blue-600 cursor-pointer gap-2 hover:bg-blue-600 cursor-pointer shadow-lg">
+                        <button onClick={handleLogOut}>
                             Logout
                         </button>
+                        <FontAwesomeIcon icon={faArrowRight}/>
                     </div>
                 </nav>
             </div>
