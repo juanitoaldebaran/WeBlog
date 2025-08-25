@@ -13,13 +13,15 @@ interface AddBlogProps {
 }
 
 const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
-    const [blogData, setBlogData] = useState<Blog>({
+    const initialBlogData = {
         imageUrl: "",
         title: "",
         content: "",
         category: "TECHNOLOGY",
         description: "",
-    } as Blog);
+    };
+
+    const [blogData, setBlogData] = useState<Blog>(initialBlogData as Blog);
     const isBlogValid = blogData.imageUrl && blogData.title && blogData.content && blogData.category && blogData.description;
     const {notification, showNotification, hideNotification} = useNotification();
 
@@ -44,13 +46,20 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
     const createBlog = async () => {
        try {
             const newBlog = await blogService.createBlog(blogData);
-            console.log("Blog created successfully");
+            console.log("Blog created successfully", newBlog);
             showNotification("Blog successfully created", "success");
-            setBlogData(newBlog);
+            
+            // FIXED: Reset form to initial state instead of setting to newBlog
+            setBlogData(initialBlogData as Blog);
+            
+            // Trigger refresh by setting a localStorage flag
+            localStorage.setItem('blogCreated', Date.now().toString());
+            
+            // Call the callback to refresh parent components
             onBlogCreated();
         } catch (error: any) {
-            showNotification("Failed to create blog");
-            throw new Error(error?.response?.data?.message || "Error creating blog");
+            showNotification(error?.response?.data?.message || "Failed to create blog", "error");
+            console.error("Error creating blog:", error);
         }
     }
 
@@ -58,10 +67,12 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
         e.preventDefault();
 
         if (!isBlogValid) {
-            showNotification("Please filled up all form", "error");
+            showNotification("Please fill up all form fields", "error");
+            return;
         }
         await createBlog();
     }
+
     return (
         <div className="bg-white min-h-screen py-12 mt-10 flex justify-center items-start">
             <div className="p-10 w-full max-w-2xl">
@@ -75,49 +86,46 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
                     <label className="block text-[18px] font-medium text-gray-700 mb-2">
                             Upload Image
                     </label>
-                    <div className="flex items-center gap-3 border rounded-lg p-2 bg-gray-50">
+                    <div className="flex items-center gap-3 shadow rounded-lg p-2 bg-gray-50">
                         <FontAwesomeIcon icon={faUpload}/>
                         <input
-                            value={blogData.imageUrl}
+                            value={blogData.imageUrl || ""}
                             id="imageUrl"
                             name="imageUrl"
                             placeholder="Enter image url"
                             className="w-full bg-transparent outline-none"
                             onChange={handleChange}
-                        >
-                        </input>
+                        />
                     </div>
                     
                     <label className="block text-[18px] font-medium text-gray-700 mb-2">
                             Blog Title
                     </label>
-                    <div className="flex items-center gap-3 border rounded-lg p-2 bg-gray-50">
+                    <div className="flex items-center gap-3 shadow rounded-lg p-2 bg-gray-50">
                         <FontAwesomeIcon icon={faBook}/>
                         <input
-                            value={blogData.title}
+                            value={blogData.title || ""} 
                             id="title"
                             name="title"
                             placeholder="Enter blog title"
                             className="w-full bg-transparent outline-none"
                             onChange={handleChange}
-                        >
-                        </input>
+                        />
                     </div>
 
                     <label className="block text-[18px] font-medium text-gray-700 mb-2">
                             Blog Content
                     </label>
-                    <div className="flex items-center gap-3 border rounded-lg p-2 bg-gray-50">
+                    <div className="flex items-center gap-3 shadow rounded-lg p-2 bg-gray-50">
                         <FontAwesomeIcon icon={faFileText}/>
                         <input
-                            value={blogData.content}
+                            value={blogData.content || ""} 
                             id="content"
                             name="content"
                             placeholder="Enter blog content"
                             className="w-full bg-transparent outline-none"
                             onChange={handleChange}
-                        >
-                        </input>
+                        />
                     </div>
                         
                     <label className="block text-[18px] font-medium text-gray-700 mb-2">
@@ -126,9 +134,9 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
                     <div>
                         <select
                             name="category"
-                            value={blogData.category}
+                            value={blogData.category || "TECHNOLOGY"} 
                             onChange={handleChange}
-                            className="w-full rounded-lg bg-gray-50 border border-gray-300 p-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                            className="w-full rounded shadow bg-gray-50 border border-gray-300 p-3 focus:ring-2 focus:ring-blue-400 outline-none"
                             >
                             {categories.map((cat) => (
                                 <option key={cat} value={cat}>
@@ -143,11 +151,11 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
                     </label>
                     <div>
                         <textarea
-                        value={blogData.description}
+                        value={blogData.description || ""}
                         id="description"
                         name="description"
                         placeholder="Enter a short description..."
-                        className="w-full rounded-lg bg-gray-50 border border-gray-300 p-3 h-20 resize-none focus:ring-2 focus:ring-blue-400 outline-none"
+                        className="w-full shadow rounded-lg bg-gray-50 border border-gray-300 p-3 h-20 resize-none focus:ring-2 focus:ring-blue-400 outline-none"
                         onChange={handleChange}
                         />
                     </div>

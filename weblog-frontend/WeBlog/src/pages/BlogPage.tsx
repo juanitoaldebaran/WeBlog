@@ -13,48 +13,69 @@ const BlogPage: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const {notification, showNotification, hideNotification} = useNotification();
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger
 
   const {user} = useAuth();
-
-    const fetchBlogs = async () => {
-      try {
-        const allBlogs = await blogService.getAllBlogs();
-        setBlogs(allBlogs);
-      } catch (error: any) {
-        showNotification("Error fetch blogs", "error");
-      }
+    
+  const fetchBlogs = async () => {
+    try {
+      const allBlogs = await blogService.getAllBlogs();
+      setBlogs(allBlogs);
+      console.log("Fetched blogs:", allBlogs.length);
+    } catch (error: any) {
+      showNotification("Error fetch blogs", "error");
+      console.error("Error fetching blogs:", error);
     }
+  }
+    
+  useEffect(() => {
+    fetchBlogs();
+  }, [refreshTrigger]); // Add refreshTrigger dependency
 
-    useEffect(() => {
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log("DEBUG: Window focused, refreshing blogs");
       fetchBlogs();
-    }, []);
-
-    useEffect(() => {
-      const handleFocus = () => {
-        console.log("DEBUG: Window focused, refreshing blogs");
-        fetchBlogs();
+    };
+    
+    // Also listen for storage events (when blogs are created)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'blogCreated') {
+        console.log("DEBUG: New blog created, refreshing");
+        setRefreshTrigger(prev => prev + 1);
+        // Clean up the flag
+        localStorage.removeItem('blogCreated');
       }
-      window.addEventListener("focus", handleFocus);
+    };
+    
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", handleStorageChange);
+    }
+  }, []);
 
-      return () => {
-        window.removeEventListener("focus", handleFocus);
-      }
-    }, []);
+  // Manual refresh function
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   const filteredBlogs = selectedCategory === "ALL" ? blogs : blogs.filter((filterBlogs) => filterBlogs.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-white">
-       <section className="pt-40 pb-14 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center max-w-4xl mx-auto">
-                        <h1 className="text-5xl font-bold sm:text-xl lg:text-6xl leading-tight mb-6">
-                            Create your blog
-                        </h1>
-                        <p className="text-blue-600 text-2xl">Share your ideas with user arround the world</p>
-                    </div>
-                </div>
-        </section>
+      <section className="pt-40 pb-14 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-5xl font-bold sm:text-xl lg:text-6xl leading-tight mb-6">
+              Create your blog
+            </h1>
+            <p className="text-blue-600 text-2xl">Share your ideas with users around the world</p>
+          </div>
+        </div>
+      </section>
 
       {!user && (
         <div className="max-w-2xl mx-auto mb-12 bg-blue-50 p-6 rounded-2xl text-center">
@@ -72,7 +93,19 @@ const BlogPage: React.FC = () => {
         <NavbarBlog selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}/>
       </div>
       
-
+      {/* Add refresh button */}
+      <div className="max-w-6xl mx-auto mb-4 text-center">
+        <button 
+          onClick={handleRefresh}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Refresh Blogs
+        </button>
+        <p className="text-sm text-gray-600 mt-2">
+          Not seeing your new blog? Click refresh or wait a moment.
+        </p>
+      </div>
+            
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBlogs.length > 0 ?
           filteredBlogs.map((allBlogs) => 
@@ -92,12 +125,12 @@ const BlogPage: React.FC = () => {
       </div>
 
       <Notification 
-                message={notification.message}
-                type={notification.type}
-                isVisible={notification.isVisible}
-                onClose={hideNotification}
-                position="top-center"
-                duration={4000}
+        message={notification.message}
+        type={notification.type}
+        isVisible={notification.isVisible}
+        onClose={hideNotification}
+        position="top-center"
+        duration={4000}
       />
     </div>
   );

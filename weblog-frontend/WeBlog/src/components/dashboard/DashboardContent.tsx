@@ -14,9 +14,9 @@ interface DashboardContentProps {
 const DashboardContent: React.FC<DashboardContentProps> = ({ refreshTrigger }) => {
   const [userProfile, setUserProfile] = useState<UserResponse | null>(null);
   const [statsData, setStatsData] = useState<UserStats | null>({
-    totalBlog: 0,
-    totalComment: 0,
-    totalView: 0,
+    totalBlogs: 0,
+    totalComments: 0,
+    totalViews: 0,
   });
 
   const { notification, showNotification, hideNotification } = useNotification();
@@ -48,19 +48,19 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ refreshTrigger }) =
   const statsCards = [
     {
       title: "Blogs",
-      value: statsData?.totalBlog || 0,
+      value: statsData?.totalBlogs || 0,
       icon: faBook,
       color: "bg-blue-100 text-blue-600",
     },
     {
       title: "Comments",
-      value: statsData?.totalComment || 0,
+      value: statsData?.totalComments || 0,
       icon: faComment,
       color: "bg-purple-100 text-purple-600",
     },
     {
       title: "Views",
-      value: statsData?.totalView || 0,
+      value: statsData?.totalViews || 0,
       icon: faEye,
       color: "bg-green-100 text-green-600",
     },
@@ -68,7 +68,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ refreshTrigger }) =
 
   return (
     <div className="space-y-10 mt-20">
-      {/* Header */}
       <div className="flex items-center gap-2">
         <p className="text-3xl font-semibold text-gray-800">
           Welcome back,
@@ -76,7 +75,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ refreshTrigger }) =
         <p className="text-gray-600 text-3xl">{userProfile?.email} !</p>
       </div>
 
-      {/* Stats */}
+     
       {isLoading ? (
         <div className="text-center text-gray-500 italic">Loading stats...</div>
       ) : (

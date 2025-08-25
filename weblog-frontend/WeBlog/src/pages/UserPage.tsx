@@ -26,7 +26,7 @@ const UserPage: React.FC = () => {
             case "my-comments":
                 return <CommentList refreshTrigger={refreshTrigger}/>;
             default:
-                return <DashboardContent />;
+                return <DashboardContent refreshTrigger={refreshTrigger}/>;
         }
     }
 
@@ -35,7 +35,7 @@ const UserPage: React.FC = () => {
             <NavbarUser />
             <div className="flex flex-1">
                 <UserSidebar onChangeTab={setActiveTab} activeTab={activeTab}/>
-                <main className="flex-1 p-6 ml-64  overflow-auto">
+                <main className="flex-1 p-6 ml-64 overflow-auto">
                     {renderContent()}
                 </main>
             </div>
