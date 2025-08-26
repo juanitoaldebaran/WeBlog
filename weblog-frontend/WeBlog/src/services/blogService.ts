@@ -33,7 +33,7 @@ async function getBlogById(blogId: number): Promise<Blog> {
 
 async function getBlogsByAuthor(authorId: number): Promise<Blog[]> {
     try {
-        const response = await api.get(`/blog/${authorId}`);
+        const response = await api.get(`/blog/author/${authorId}`);
         console.log("Request sent to get blogs by author", response.data);
         return response.data as Blog[];
     } catch (error: any) {
@@ -62,7 +62,7 @@ async function getBlogsByCategory(category: string): Promise<Blog[]> {
 
 async function searchBlog(keyword: string): Promise<Blog[]> {
     try {
-        const response = await api.get(`/blog/search`, { params: keyword });
+        const response = await api.get(`/blog/search`, { params: {keyword} });
         console.log("Request sent to search blog by keyword", response.data);
         return response.data as Blog[];
     } catch (error: any) {

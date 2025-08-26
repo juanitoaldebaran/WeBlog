@@ -1,9 +1,23 @@
 import type { LoginRequest, LoginResponse, RegisterRequest, User } from "../types/auth";
 import api from "../config/api";
 
+const dispatchAuthEvent = () => {
+    window.dispatchEvent(new Event('authStateChanged'));
+}
+
 async function login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
         const response = await api.post('/auth/login', credentials);
+
+        if (response.data.token) {
+            localStorage.setItem("jwtToken", response.data.token);
+        }
+
+        if (response.data.user) {
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+        }
+
+        dispatchAuthEvent();
 
         console.log("Sending POST method for login");
         return response.data;
@@ -28,6 +42,9 @@ async function register(credentials: RegisterRequest): Promise<User> {
 function logout() {
     localStorage.removeItem("jwtToken");
     localStorage.removeItem("user");
+
+    dispatchAuthEvent();
+    
     window.location.href = '/auth/login';
 }
 

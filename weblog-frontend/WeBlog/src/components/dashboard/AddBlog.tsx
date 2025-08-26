@@ -12,6 +12,10 @@ interface AddBlogProps {
     onBlogCreated: () => void;
 }
 
+const dispatchBlogCreatedEvent = () => {
+    window.dispatchEvent(new Event('blogCreated'));
+};
+
 const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
     const initialBlogData = {
         imageUrl: "",
@@ -22,6 +26,7 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
     };
 
     const [blogData, setBlogData] = useState<Blog>(initialBlogData as Blog);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const isBlogValid = blogData.imageUrl && blogData.title && blogData.content && blogData.category && blogData.description;
     const {notification, showNotification, hideNotification} = useNotification();
 
@@ -45,21 +50,28 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
 
     const createBlog = async () => {
        try {
+            setIsSubmitting(true);
             const newBlog = await blogService.createBlog(blogData);
             console.log("Blog created successfully", newBlog);
-            showNotification("Blog successfully created", "success");
+            showNotification("Blog successfully created! It will appear in the blog list shortly.", "success");
             
-            // FIXED: Reset form to initial state instead of setting to newBlog
+            // Reset form
             setBlogData(initialBlogData as Blog);
             
-            // Trigger refresh by setting a localStorage flag
+            // Dispatch custom event for immediate UI updates
+            dispatchBlogCreatedEvent();
+            
+            // Also use localStorage as fallback
             localStorage.setItem('blogCreated', Date.now().toString());
             
-            // Call the callback to refresh parent components
+            // Call the callback
             onBlogCreated();
+            
         } catch (error: any) {
             showNotification(error?.response?.data?.message || "Failed to create blog", "error");
             console.error("Error creating blog:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -70,6 +82,7 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
             showNotification("Please fill up all form fields", "error");
             return;
         }
+        
         await createBlog();
     }
 
@@ -116,14 +129,15 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
                     <label className="block text-[18px] font-medium text-gray-700 mb-2">
                             Blog Content
                     </label>
-                    <div className="flex items-center gap-3 shadow rounded-lg p-2 bg-gray-50">
-                        <FontAwesomeIcon icon={faFileText}/>
-                        <input
+                    <div className="flex items-start gap-3 shadow rounded-lg p-2 bg-gray-50">
+                        <FontAwesomeIcon icon={faFileText} className="mt-2"/>
+                        <textarea
                             value={blogData.content || ""} 
                             id="content"
                             name="content"
                             placeholder="Enter blog content"
-                            className="w-full bg-transparent outline-none"
+                            rows={8}
+                            className="w-full bg-transparent outline-none resize-none"
                             onChange={handleChange}
                         />
                     </div>
@@ -160,8 +174,12 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
                         />
                     </div>
 
-                    <button type="submit" className="bg-blue-500 rounded text-white p-4 cursor-pointer hover:bg-blue-700">
-                        {isLoading ? <LoadingSpinner /> : "Add Blog"}
+                    <button 
+                        type="submit" 
+                        disabled={!isBlogValid || isSubmitting}
+                        className="bg-blue-500 rounded text-white p-4 cursor-pointer hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full"
+                    >
+                        {isSubmitting || isLoading ? <LoadingSpinner /> : "Create Blog"}
                     </button>
                 </form>
             </div>
@@ -171,7 +189,7 @@ const AddBlog: React.FC<AddBlogProps> = ({onBlogCreated}) => {
                 type={notification.type}
                 isVisible={notification.isVisible}
                 onClose={hideNotification}
-                duration={400}
+                duration={4000}
                 position={"top-center"}
             />
         </div>
