@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import useAuth from '../../hooks/useAuth';
+import { useEffect, useState } from 'react';
 
 interface NavLinkType {
     name: string;
@@ -18,6 +19,34 @@ const navLinks: NavLinkType[] = [
 const Navbar: React.FC = () => {
     const { isAuthenticated } = useAuthContext();
     const {user} = useAuth();
+    const [authState, setAuthState] = useState(isAuthenticated);
+    const [currentUser, setCurrentUser] = useState(user);
+
+    useEffect(() => {
+        setAuthState(isAuthenticated);
+        setCurrentUser(user);
+    }, [isAuthenticated, user]);
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const token = localStorage.getItem("jwtToken");
+            const userData = localStorage.getItem("user");
+            setAuthState(!!token);
+            setCurrentUser(userData ? JSON.parse(userData) : null);
+        }
+
+        const handleAuthChange = () => {
+            handleStorageChange();
+        }
+
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('authStateChanged', handleAuthChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('authStateChanged', handleAuthChange);
+        }
+    }, []);
 
     return (
        <header className="fixed w-full top-0 z-50 backdrop-blur shadow bg-white border-b border-gray-200">

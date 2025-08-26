@@ -3,7 +3,7 @@ import type { Blog } from "../types/blog";
 import useAuth from "../hooks/useAuth";
 import blogService from "../services/blogService";
 import NavbarBlog from "../components/common/NavbarBlog";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import BlogCard from "../components/common/BlogCard";
 import useNotification from "../hooks/useNotification";
 import Notification from "../components/common/Notification";
@@ -13,24 +13,28 @@ const BlogPage: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const {notification, showNotification, hideNotification} = useNotification();
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {user} = useAuth();
     
   const fetchBlogs = async () => {
     try {
+      setIsLoading(true);
       const allBlogs = await blogService.getAllBlogs();
       setBlogs(allBlogs);
       console.log("Fetched blogs:", allBlogs.length);
     } catch (error: any) {
       showNotification("Error fetch blogs", "error");
       console.error("Error fetching blogs:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
     
   useEffect(() => {
     fetchBlogs();
-  }, [refreshTrigger]); // Add refreshTrigger dependency
+  }, [refreshTrigger]); 
 
   useEffect(() => {
     const handleFocus = () => {
@@ -38,26 +42,31 @@ const BlogPage: React.FC = () => {
       fetchBlogs();
     };
     
-    // Also listen for storage events (when blogs are created)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'blogCreated') {
         console.log("DEBUG: New blog created, refreshing");
         setRefreshTrigger(prev => prev + 1);
-        // Clean up the flag
         localStorage.removeItem('blogCreated');
       }
+    };
+
+    // Listen for custom blog created events
+    const handleBlogCreated = () => {
+      console.log("DEBUG: Blog created event received");
+      setRefreshTrigger(prev => prev + 1);
     };
     
     window.addEventListener("focus", handleFocus);
     window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("blogCreated", handleBlogCreated);
     
     return () => {
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("blogCreated", handleBlogCreated);
     }
   }, []);
 
-  // Manual refresh function
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
   };
@@ -66,63 +75,120 @@ const BlogPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="pt-40 pb-14 px-4 sm:px-6 lg:px-8">
+      <section className="pt-40 pb-14 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl font-bold sm:text-xl lg:text-6xl leading-tight mb-6">
-              Create your blog
+            <h1 className="text-5xl font-bold sm:text-4xl lg:text-6xl leading-tight mb-6 text-gray-800">
+              Discover Amazing Blogs
             </h1>
-            <p className="text-blue-600 text-2xl">Share your ideas with users around the world</p>
+            <p className="text-blue-600 text-xl lg:text-2xl">Share your ideas with users around the world</p>
           </div>
         </div>
       </section>
 
       {!user && (
-        <div className="max-w-2xl mx-auto mb-12 bg-blue-50 p-6 rounded-2xl text-center">
-          <h2 className="text-lg font-semibold text-yellow-800">
-            🔒 You must sign in to create a blog
+        <div className="max-w-2xl mx-auto mb-12 bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-2xl text-center mx-4 border border-blue-100">
+          <div className="text-4xl mb-4">🔒</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Join Our Community
           </h2>
-          <p className="text-sm text-gray-600 mt-2">
-            Please <Link to={"/auth/login"} className="text-blue-600 hover:underline"> Login </Link>
-            or Create an account <Link to={"/auth/signup"} className="text-blue-600 hover:underline">Sign Up </Link>
+          <p className="text-gray-600 mb-6">
+            Sign in to create and share your own blogs with the world
           </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link 
+              to={"/auth/login"} 
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Login
+            </Link>
+            <Link 
+              to={"/auth/signup"} 
+              className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto mb-12">
+      {/* Category Navigation */}
+      <div className="max-w-6xl mx-auto mb-8 px-4">
         <NavbarBlog selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}/>
       </div>
       
-      {/* Add refresh button */}
-      <div className="max-w-6xl mx-auto mb-4 text-center">
+      {/* Refresh Button */}
+      <div className="max-w-6xl mx-auto mb-8 text-center px-4">
         <button 
           onClick={handleRefresh}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          disabled={isLoading}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Refresh Blogs
+          {isLoading ? "Loading..." : "Refresh Blogs"}
         </button>
-        <p className="text-sm text-gray-600 mt-2">
+        <p className="text-sm text-gray-500 mt-2">
           Not seeing your new blog? Click refresh or wait a moment.
         </p>
       </div>
-            
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredBlogs.length > 0 ?
-          filteredBlogs.map((allBlogs) => 
-            <Link key={allBlogs.id} to={`/blog/${allBlogs.id}`}>
-              <BlogCard blog={allBlogs}/>
-            </Link>
-        )
-        :
-          <p className="text-center col-span-3 text-gray-600">
-            No Blogs available yet.
-          </p>
-        }
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 pb-16">
+        {/* Loading state */}
+        {isLoading ? (
+          <div className="text-center py-16">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+            <p className="mt-4 text-gray-600 text-lg">Loading amazing blogs...</p>
+          </div>
+        ) : (
+          <>
+            {/* Results count */}
+            <div className="mb-6">
+              <p className="text-gray-600">
+                {selectedCategory === "ALL" 
+                  ? `Showing ${filteredBlogs.length} blog${filteredBlogs.length !== 1 ? 's' : ''}` 
+                  : `${filteredBlogs.length} blog${filteredBlogs.length !== 1 ? 's' : ''} in ${selectedCategory}`
+                }
+              </p>
+            </div>
+
+            {/* Blog Grid */}
+            {filteredBlogs.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredBlogs.map((blog) => (
+                  <Link key={blog.id} to={`/blog/${blog.id}`} className="block h-full">
+                    <BlogCard blog={blog} />
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="max-w-md mx-auto">
+                  <div className="text-6xl mb-4">📝</div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    {selectedCategory === "ALL" ? "No Blogs Available Yet" : `No ${selectedCategory} Blogs Found`}
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    {selectedCategory === "ALL" 
+                      ? "Be the first to share your story with the community!" 
+                      : `No blogs found in the ${selectedCategory} category. Try a different category or create the first one!`
+                    }
+                  </p>
+                  {user && (
+                    <Link 
+                      to="/create-blog" 
+                      className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      Create Your First Blog
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      <div className="mt-150">
-        <Footer />
-      </div>
+      <Footer />
 
       <Notification 
         message={notification.message}

@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/route/ProtectedRoute';
+import BlogDetailPage from './components/dashboard/BlogDetailPage';
 
 function AppContent() {
   const location = useLocation();
@@ -27,6 +28,7 @@ function AppContent() {
         </Route>
         <Route path='/about' element={<AboutPage />} />
         <Route path='/blog' element={<BlogPage />} />
+        <Route path='/blog/:id' element={<BlogDetailPage />} />
       </Routes>
     </AuthProvider>
   );

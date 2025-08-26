@@ -1,34 +1,77 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Blog } from "../../types/blog";
-import { faCalendar, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faEye, faUser } from "@fortawesome/free-solid-svg-icons";
+import useAuth from "../../hooks/useAuth";
 
 interface BlogCardProps {
   blog: Blog;
 }
 
 export default function BlogCard({ blog }: BlogCardProps) {
+  const {user} = useAuth();
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   return (
-    <div className="bg-white p-5 rounded-lg shadow flex flex-col shadow hover:shadow-lg transition gap-2">
-      <img
-      src={blog.imageUrl}
-      alt={blog.title}
-      className="object-cover w-full rounded-xl mb-4"
-      />
-      <h2 className="text-xl font-bold">{blog.title}</h2>
-      <div>
-        <span></span>
-      </div>
-      <div className="flex items-start justify-center flex-col gap-2">
-        <span className="bg-blue-500 text-white rounded-lg py-2 px-1 text-sm">{blog.category}</span>
-        <span className="text-sm text-light">{blog.description}</span>
-        <div className="flex items-center justify-center gap-2">
-          <FontAwesomeIcon icon={faEye} className="text-blue-500 bg-gray-100 p-2 rounded-lg"/>
-          <span className="text-sm">{blog.views}</span>
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden h-full flex flex-col">
+      {/* Image Container */}
+      <div className="relative overflow-hidden">
+        <img
+          src={blog.imageUrl}
+          alt={blog.title}
+          className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/api/placeholder/400/200';
+          }}
+        />
+        {/* Category Badge */}
+        <div className="absolute top-3 left-3">
+          <span className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+            {blog.category}
+          </span>
         </div>
-        <span className="flex items-center justify-center gap-2 font-light text-sm">
-          <FontAwesomeIcon icon={faCalendar} className="bg-gray-100 p-2 rounded-lg"/>
-          {new Date(blog.createdAt).toLocaleDateString()}
-        </span>
+      </div>
+
+      {/* Content Container */}
+      <div className="p-5 flex flex-col flex-grow">
+        {/* Title */}
+        <h2 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2 hover:text-blue-600 transition-colors">
+          {blog.title}
+        </h2>
+
+        {/* Description */}
+        <p className="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow">
+          {blog.description}
+        </p>
+
+        {/* Meta Information */}
+        <div className="mt-auto space-y-2">
+          {/* Author */}
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <FontAwesomeIcon icon={faUser} className="text-xs" />
+            <span>
+              {user?.firstName} {user?.lastName}
+            </span>
+          </div>
+
+          {/* Date and Views */}
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faCalendar} className="text-xs" />
+              <span>{formatDate(blog.createdAt || '')}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faEye} className="text-xs" />
+              <span>{blog.views || 0} views</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
