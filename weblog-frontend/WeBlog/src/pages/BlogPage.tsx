@@ -127,7 +127,7 @@ const BlogPage: React.FC = () => {
           {isLoading ? "Loading..." : "Refresh Blogs"}
         </button>
         <p className="text-sm text-gray-500 mt-2">
-          Not seeing your new blog? Click refresh or wait a moment.
+          Not seeing your new blog? Please Click refresh or wait a moment.
         </p>
       </div>
 
